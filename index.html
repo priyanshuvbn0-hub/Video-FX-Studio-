@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#08090e">
+  <title>VideoFX Studio Pro</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-badge">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#e9d5ff"/>
+          </linearGradient>
+        </defs>
+        <path d="M5 4.8C5 3.6 6.3 2.9 7.3 3.5L19.6 10.7C20.6 11.3 20.6 12.7 19.6 13.3L7.3 20.5C6.3 21.1 5 20.4 5 19.2V4.8Z" fill="url(#logoGrad)"/>
+        <path d="M12 3L13.5 7.5L18 9L13.5 10.5L12 15L10.5 10.5L6 9L10.5 7.5L12 3Z" fill="#38bdf8" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>VideoFX</h1>
+      <span class="pro-tag">PRO</span>
+    </div>
+  </div>
+
+  <label class="upload-pill" for="videoInput">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+    <span>Import</span>
+    <input type="file" id="videoInput" accept="video/*">
+  </label>
+</header>
+
+<!-- STICKY TOP VIDEO PREVIEW -->
+<section class="preview-stage">
+  <div class="canvas-wrapper">
+    <canvas id="fxCanvas" width="640" height="360"></canvas>
+  </div>
+
+  <video id="sourceVideo" playsinline crossorigin="anonymous"></video>
+
+  <div class="transport-bar">
+    <button id="playPauseBtn" class="mini-btn" disabled>▶ Play</button>
+    <span id="status" class="status-text">Tap "+ Import" to load video</span>
+    <button id="muteBtn" class="mini-btn gray" disabled>🔊 On</button>
+  </div>
+</section>
+
+<!-- TAB PANELS CONTAINER -->
+<main class="panels-container">
+
+  <!-- TAB 1: RATIO & TRIM -->
+  <div id="tab-trim" class="tab-panel active">
+    <h3>Canvas Ratio & Trim</h3>
+    <div class="ratio-row" id="ratioGroup">
+      <button class="ratio-btn active" data-ratio="original">Original</button>
+      <button class="ratio-btn" data-ratio="9:16">9:16</button>
+      <button class="ratio-btn" data-ratio="16:9">16:9</button>
+      <button class="ratio-btn" data-ratio="1:1">1:1</button>
+    </div>
+
+    <label>Trim Start <span class="val" id="trimStartVal">0.0s</span></label>
+    <input type="range" id="trimStart" min="0" max="10" step="0.1" value="0" disabled>
+
+    <label>Trim End <span class="val" id="trimEndVal">0.0s</span></label>
+    <input type="range" id="trimEnd" min="0" max="10" step="0.1" value="0" disabled>
+
+    <label class="toggle-card">
+      <input type="checkbox" id="fadeToggle">
+      <span>Smooth Fade-In & Fade-Out</span>
+    </label>
+  </div>
+
+  <!-- TAB 2: VISUAL EFFECTS -->
+  <div id="tab-effects" class="tab-panel">
+    <h3>Filters & Motion</h3>
+    <div class="effects-grid" id="effectsGrid">
+      <button class="fx-btn active" data-fx="none">Original</button>
+      <button class="fx-btn" data-fx="neon">Cyberpunk</button>
+      <button class="fx-btn" data-fx="vhs">Retro VHS</button>
+      <button class="fx-btn" data-fx="glitch">RGB Glitch</button>
+      <button class="fx-btn" data-fx="matrix">Matrix Rain</button>
+      <button class="fx-btn" data-fx="noir">Cinema Noir</button>
+      <button class="fx-btn" data-fx="dreamy">Dreamy Glow</button>
+      <button class="fx-btn" data-fx="mirror">Mirror Split</button>
+    </div>
+
+    <label>Brightness <span class="val" id="brightVal">100%</span></label>
+    <input type="range" id="brightness" min="50" max="160" value="100">
+
+    <label>Contrast <span class="val" id="contrastVal">100%</span></label>
+    <input type="range" id="contrast" min="50" max="180" value="100">
+
+    <label>Saturation <span class="val" id="satVal">100%</span></label>
+    <input type="range" id="saturation" min="0" max="200" value="100">
+
+    <label>Playback Speed <span class="val" id="speedVal">1.0x</span></label>
+    <input type="range" id="speed" min="0.5" max="2.0" step="0.25" value="1.0">
+
+    <button id="resetAdjustBtn" class="action-btn gray" style="margin-top:14px;">Reset Adjustments</button>
+  </div>
+
+  <!-- TAB 3: TEXT & STICKERS -->
+  <div id="tab-text" class="tab-panel">
+    <h3>Text & Stickers</h3>
+    <input type="text" id="overlayText" placeholder="Type caption or watermark...">
+
+    <div class="btn-row">
+      <div style="flex:1;">
+        <label>Color</label>
+        <input type="color" id="overlayColor" value="#ffffff" class="color-picker">
+      </div>
+      <div style="flex:2;">
+        <label>Alignment</label>
+        <select id="overlayPos">
+          <option value="bottom">Bottom Center</option>
+          <option value="top">Top Center</option>
+          <option value="center">Middle Center</option>
+          <option value="watermark">Bottom-Right Watermark</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Text Size <span class="val" id="fontSizeVal">28px</span></label>
+    <input type="range" id="overlaySize" min="14" max="64" value="28">
+
+    <div class="btn-row" style="margin-top:8px;">
+      <div style="flex:1;">
+        <label>Sticker</label>
+        <select id="stickerSelect">
+          <option value="none">None</option>
+          <option value="subscribe">Subscribe Badge</option>
+          <option value="🔥">Fire</option>
+          <option value="❤️">Heart</option>
+          <option value="🚀">Rocket</option>
+          <option value="⚡">Lightning</option>
+        </select>
+      </div>
+      <div style="flex:1;">
+        <label>Corner</label>
+        <select id="stickerPos">
+          <option value="top-right">Top Right</option>
+          <option value="top-left">Top Left</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="center">Center</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: AUDIO & VISUALIZER -->
+  <div id="tab-audio" class="tab-panel">
+    <h3>Sound & Beat Wave</h3>
+    <label class="upload-box" for="bgmInput">
+      <div style="font-weight:700;color:#34d399;font-size:13px;">+ Add Background Music</div>
+      <div id="bgmFileName" style="font-size:11px;color:#94a3b8;margin-top:4px;">MP3, WAV, AAC supported</div>
+      <input type="file" id="bgmInput" accept="audio/*">
+    </label>
+
+    <div class="btn-row" style="margin-top:8px;">
+      <div style="flex:2;">
+        <label>Visualizer</label>
+        <select id="vizStyle">
+          <option value="none">Off</option>
+          <option value="bars">Neon Bars</option>
+          <option value="circle">Pulse Ring</option>
+        </select>
+      </div>
+      <div style="flex:1;">
+        <label>Wave Color</label>
+        <input type="color" id="vizColor" value="#a78bfa" class="color-picker">
+      </div>
+    </div>
+
+    <label>Video Audio <span class="val" id="vidVolVal">100%</span></label>
+    <input type="range" id="vidVolume" min="0" max="100" value="100">
+
+    <label>Music Volume <span class="val" id="bgmVolVal">50%</span></label>
+    <input type="range" id="bgmVolume" min="0" max="100" value="50">
+  </div>
+
+  <!-- TAB 5: EXPORT -->
+  <div id="tab-export" class="tab-panel">
+    <h3>Render & Export</h3>
+
+    <div class="btn-row" style="margin-bottom:12px;">
+      <div style="flex:1;">
+        <label style="margin-top:0;">Resolution</label>
+        <select id="exportRes">
+          <option value="720" selected>720p HD (Fast)</option>
+          <option value="1080">1080p Full HD</option>
+          <option value="480">480p Lite</option>
+        </select>
+      </div>
+      <div style="flex:1;">
+        <label style="margin-top:0;">Quality / Bitrate</label>
+        <select id="exportBitrate">
+          <option value="3">Standard (3 Mbps)</option>
+          <option value="6" selected>High (6 Mbps)</option>
+          <option value="10">Ultra (10 Mbps)</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="exportBtn" class="action-btn green" disabled>Export Final Video</button>
+    <a id="downloadLink" style="display:none;"></a>
+  </div>
+
+</main>
+
+<!-- FLOATING MODERN CAPSULE BOTTOM DOCK -->
+<div class="dock-wrapper">
+  <nav class="bottom-nav">
+    <button class="nav-tab active" data-target="tab-trim">
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2v14a2 2 0 0 0 2 2h14"/>
+        <path d="M18 22V8a2 2 0 0 0-2-2H2"/>
+      </svg>
+      <span>Crop</span>
+    </button>
+
+    <button class="nav-tab" data-target="tab-effects">
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/>
+      </svg>
+      <span>Filters</span>
+    </button>
+
+    <button class="nav-tab" data-target="tab-text">
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="4 7 4 4 20 4 20 7"/>
+        <line x1="9" y1="20" x2="15" y2="20"/>
+        <line x1="12" y1="4" x2="12" y2="20"/>
+      </svg>
+      <span>Text</span>
+    </button>
+
+    <button class="nav-tab" data-target="tab-audio">
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/>
+        <circle cx="18" cy="16" r="3"/>
+      </svg>
+      <span>Audio</span>
+    </button>
+
+    <button class="nav-tab" data-target="tab-export">
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span>Export</span>
+    </button>
+  </nav>
+</div>
+
+<!-- JS Modules -->
+<script src="effects.js"></script>
+<script src="overlays.js"></script>
+<script src="stickers.js"></script>
+<script src="audio.js"></script>
+<script src="visualizer.js"></script>
+<script src="recorder.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
